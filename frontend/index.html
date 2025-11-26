@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Task Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Smart Task Analyzer</h1>
+            <p>Intelligently prioritize your tasks based on urgency, importance, effort, and dependencies</p>
+        </header>
+
+        <div class="app-container">
+            <div class="strategy-section">
+                <label for="strategy">Prioritization Strategy:</label>
+                <select id="strategy">
+                    <option value="smart_balance">Smart Balance</option>
+                    <option value="fastest_wins">Fastest Wins</option>
+                    <option value="high_impact">High Impact</option>
+                    <option value="deadline_driven">Deadline Driven</option>
+                </select>
+                <button id="analyzeBtn">Analyze All Tasks</button>
+                <button id="suggestBtn">Get Top 3 Recommendations</button>
+            </div>
+
+            <div class="input-section">
+                <div class="task-form">
+                    <h3>Add New Task</h3>
+                    <form id="taskForm">
+                        <div class="form-row">
+                            <input type="text" name="id" placeholder="Task ID" required>
+                            <input type="text" name="title" placeholder="Task Title" required>
+                        </div>
+                        <div class="form-row">
+                            <input type="date" name="due_date" placeholder="Due Date">
+                            <input type="number" name="estimated_hours" placeholder="Hours" step="0.5" min="0.5">
+                            <input type="number" name="importance" placeholder="Importance (1-10)" min="1" max="10">
+                        </div>
+                        <input type="text" name="dependencies" placeholder="Dependencies (comma separated)">
+                        <button type="submit">Add Task</button>
+                    </form>
+                </div>
+
+                <div class="bulk-input">
+                    <h3>Or Input JSON</h3>
+                    <textarea id="jsonInput" placeholder='[{"id": "task1", "title": "Task 1", ...}]' rows="6"></textarea>
+                    <button id="loadJson">Load from JSON</button>
+                </div>
+
+                <div class="current-tasks">
+                    <h3>Current Tasks (<span id="taskCount">0</span>)</h3>
+                    <div id="tasksList"></div>
+                    <button id="clearTasks">Clear All</button>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div id="loading" class="hidden">
+                    <div class="spinner"></div>
+                    <p>Analyzing tasks...</p>
+                </div>
+
+                <div id="error" class="error hidden"></div>
+
+                <div id="analysisResults" class="hidden">
+                    <h3>Prioritized Tasks</h3>
+                    <div class="strategy-info">Strategy: <span id="currentStrategy"></span></div>
+                    <div id="tasksResults"></div>
+                </div>
+
+                <div id="suggestionsResults" class="hidden">
+                    <h3>Top Recommendations</h3>
+                    <div class="strategy-info">Strategy: <span id="suggestionStrategy"></span></div>
+                    <div id="suggestionsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

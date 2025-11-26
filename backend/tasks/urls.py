@@ -1,8 +1,7 @@
 from django.urls import path
 from . import views
 
-#Initiate endpoints
 urlpatterns = [
-    path("analyze/", views.analyze_tasks),
-    path("suggest/", views.suggest_tasks),
+    path("analyze/", views.analyze_tasks_view, name="analyze-tasks"),
+    path("suggest/", views.suggest_tasks_view, name="suggest-tasks"),
 ]
