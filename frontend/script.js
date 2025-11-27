@@ -149,7 +149,7 @@ class TaskManager {
                     <div class="task-explanation">${task.explanation}</div>
                     <div class="task-details">
                         <small>ID: ${task.id} | Due: ${task.due_date || 'No date'} | 
-                        Hours: ${task.estimated_hours || 'N/A'} | Importance: ${task.importance || 'N/A'}</small>
+                        Hours: ${task.estimated_hours ?? 'N/A'} | Importance: ${task.importance ?? 'N/A'}</small>
                     </div>
                 </div>
             `;
@@ -174,7 +174,7 @@ class TaskManager {
                     <div class="task-reasoning">${rec.reasoning}</div>
                     <div class="task-details">
                         <small>ID: ${task.id} | Due: ${task.due_date || 'No date'} | 
-                        Hours: ${task.estimated_hours || 'N/A'} | Importance: ${task.importance || 'N/A'}</small>
+                        Hours: ${task.estimated_hours ?? 'N/A'} | Importance: ${task.importance ?? 'N/A'}</small>
                     </div>
                 </div>
             `;
@@ -188,7 +188,7 @@ class TaskManager {
         tasksList.innerHTML = this.tasks.map(task => `
             <div class="task-item">
                 <span>${task.id}: ${task.title}</span>
-                <button class="remove-task" onclick="taskManager.removeTask('${task.id}')">Remove</button>
+                <button class="remove-task" data-task-id="${task.id}">Remove</button>
             </div>
         `).join('');
          tasksList.querySelectorAll('.remove-task').forEach(button => {
