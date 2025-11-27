@@ -100,6 +100,20 @@ def analyze_tasks(tasks: List[Dict], strategy: str = "smart_balance") -> List[Di
     if not tasks:
         return []
     
+    if strategy not in STRATEGIES:
+        raise ValueError(f"Unknown strategy: {strategy}. Available: {list(STRATEGIES.keys())}")
+    
+    valid_tasks = []
+    for task in tasks:
+        if not task.get('id'):
+            continue  
+        if not task.get('title'):
+            task['title'] = f"Untitled Task {task['id']}"
+        valid_tasks.append(task)
+    
+    if not valid_tasks:
+        return []
+    
     weights = STRATEGIES.get(strategy, STRATEGIES["smart_balance"])
     
     blocking_counts = defaultdict(int)
@@ -138,9 +152,16 @@ def get_top_recommendations(tasks: List[Dict], strategy: str = "smart_balance", 
             'reasoning': reasoning
         })
     
-    return recommendations
+    return {
+        'recommendations': recommendations,
+        'strategy_used': strategy,
+        'total_tasks_analyzed': len(analyzed_tasks),
+        'timestamp': datetime.now().isoformat()
+    }
 
 def generate_recommendation_reasoning(task: Dict, rank: int) -> str:
+
+
     factors = []
     
     if task['urgency_score'] > 0.8:
@@ -163,3 +184,10 @@ def generate_recommendation_reasoning(task: Dict, rank: int) -> str:
         factors.append("Well-balanced")
     
     return f"Rank #{rank} - Score: {task['priority_score']}/100. Key factors: {', '.join(factors)}"
+
+def validate_task_data(task: Dict) -> Tuple[bool, str]:
+    if not task.get('id'):
+        return False, "Task missing 'id'"
+    if not task.get('title'):
+        return False, "Task missing 'title'"
+    return True, "Valid"
