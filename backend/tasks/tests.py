@@ -52,7 +52,11 @@ class TaskScoringTest(TestCase):
         self.assertEqual(len(cycles), 0)
 
     def test_get_top_recommendations(self):
-        recommendations = get_top_recommendations(self.sample_tasks, limit=2)
+        result = get_top_recommendations(self.sample_tasks, limit=2)
+        if isinstance(result, dict):
+            recommendations =result['recommendations']
+        else:
+            recommendations = result    
         self.assertEqual(len(recommendations), 2)
         self.assertEqual(recommendations[0]["rank"], 1)
         self.assertIn("reasoning", recommendations[0])
