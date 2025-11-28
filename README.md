@@ -94,13 +94,13 @@ The assignment provides optional bonus prompts. The following were addressed:
 ## Dependency Graph Visualization 
 
   ### A complete graph-based representation of task dependencies was built, including:
-    1. Directed graph structure showing task flows
-    2. Node grouping (critical, leaf, root, independent, normal)
-    3. Automatic detection & highlighting of circular dependencies
-    4. Click-to-highlight corresponding task in list
-    5. Export as PNG
-    6. Toggle physics, auto-fit, and dynamic layout
-    7. Visually accurate representation of each task’s blocking impact 
+  1. Directed graph structure showing task flows
+  2. Node grouping (critical, leaf, root, independent, normal)
+  3. Automatic detection & highlighting of circular dependencies
+  4. Click-to-highlight corresponding task in list
+  5. Export as PNG
+  6. Toggle physics, auto-fit, and dynamic layout
+  7. Visually accurate representation of each task’s blocking impact 
 
 ## Recommendation limits
 
