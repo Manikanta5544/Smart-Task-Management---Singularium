@@ -239,33 +239,42 @@ class TaskManager {
         document.getElementById('suggestionsResults').classList.add('hidden');
         document.getElementById('error').classList.add('hidden');
     }
-     async showDependencyGraph() {
-        if (this.tasks.length === 0) {
-            this.showError('No tasks to visualize');
-            return;
+    async showDependencyGraph() {
+    if (this.tasks.length === 0) {
+        this.showError("No tasks to visualize");
+        return;
+    }
+
+    this.showLoading();
+
+    try {
+        const tasksJson = encodeURIComponent(JSON.stringify(this.tasks));
+
+        const response = await fetch(`${this.BACKEND_URL}/api/tasks/dependency-graph/?tasks=${tasksJson}`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} - ${response.statusText}`);
         }
 
-        this.showLoading();
+        const data = await response.json();
 
-        try {
-            const tasksJson = encodeURIComponent(JSON.stringify(this.tasks));
-            const response = await fetch(`${this.BACKEND_URL}/api/tasks/dependency-graph/?tasks=${tasksJson}`);
+        const graphContainer = document.getElementById("graphContainer");
+        if (!graphContainer) throw new Error("graphContainer missing in HTML");
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+        graphContainer.classList.remove("hidden");
 
-            const data = await response.json();
-            this.graphData = data.graph;
+        setTimeout(() => {
             this.renderDependencyGraph(data.graph);
             this.displayGraphAnalysis(data.graph.analysis);
-            
-        } catch (error) {
-            this.showError('Failed to load dependency graph: ' + error.message);
-        } finally {
-            this.hideLoading();
-        }
+        }, 50);
+
+    } catch (err) {
+        this.showError("Failed to load dependency graph: " + err.message);
+    } finally {
+        this.hideLoading();
     }
+}
+
 
     renderDependencyGraph(graphData) {
         const graphContainer = document.getElementById('graphContainer');
@@ -279,70 +288,121 @@ class TaskManager {
             this.network.destroy();
         }
 
+        const isDarkMode = document.body.classList.contains('dark');
+
         const nodes = new vis.DataSet(graphData.nodes.map(node => ({
             id: node.id,
-            label: node.label.length > 20 ? node.label.substring(0, 20) + '...' : node.label,
+            label: node.label.length > 22 ? node.label.substring(0, 22) + '...' : node.label,
             group: node.group,
             value: node.value,
             title: node.title,
-            font: { size: 14 },
             shape: 'dot',
-            size: 20 + (node.value * 2),
-            borderWidth: 2,
+            size: 18 + (node.value * 1.6),
+            
+            font: {
+                size: 15,
+                color: isDarkMode ? "#f1f5f9" : "#1f2937",
+                face: "Inter",
+                bold: false,
+                strokeWidth: 1.2,
+                strokeColor: isDarkMode ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)"
+            },
+
             color: this.getNodeColor(node.group),
-            shadow: true
+            borderWidth: 2,
+            shadow: {
+                enabled: true,
+                color: isDarkMode ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.15)",
+                size: 12,
+                x: 0,
+                y: 3
+            }
         })));
+
 
         const edges = new vis.DataSet(graphData.edges.map(edge => ({
             from: edge.from,
             to: edge.to,
             arrows: 'to',
-            color: edge.color,
+            color: {
+                color: isDarkMode ? "rgba(140,180,255,0.75)" : "rgba(37,99,235,0.70)",
+                highlight: isDarkMode ? "#90b4ff" : "#2563eb",
+                hover: isDarkMode ? "#90b4ff" : "#2563eb"
+            },
             width: 2,
-            smooth: { enabled: true, type: 'continuous' },
-            shadow: true
+            smooth: {
+                enabled: true,
+                type: "continuous"
+            },
+            shadow: {
+                enabled: true,
+                color: isDarkMode ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.15)",
+                size: 8,
+                x: 0,
+                y: 2
+            }
         })));
+
+
+
 
         const container = graphNetwork;
         const data = { nodes, edges };
         
-        const options = {
-            layout: {
-                improvedLayout: true
-            },
+       const options = {
+            layout: { improvedLayout: true },
+
             physics: {
                 enabled: this.physicsEnabled,
-                stabilization: { iterations: 100 }
+                stabilization: { iterations: 120 }
             },
+
             interaction: {
                 dragNodes: true,
                 dragView: true,
                 zoomView: true
             },
+
             groups: {
                 critical: {
-                    color: { background: '#e74c3c', border: '#c0392b' },
-                    font: { color: '#ffffff', size: 14 },
-                    borderWidth: 3
+                    color: { background: "#ff6b6b", border: "#d84747" },
+                    font: { color: "#ffffff", size: 16, bold: true }
                 },
                 root: {
-                    color: { background: '#27ae60', border: '#219a52' },
-                    font: { color: '#ffffff', size: 14 }
+                    color: { background: "#4ade80", border: "#2f9e57" },
+                    font: { color: "#ffffff", size: 15 }
                 },
                 leaf: {
-                    color: { background: '#3498db', border: '#2980b9' },
-                    font: { color: '#ffffff', size: 14 }
+                    color: { background: "#60a5fa", border: "#3b82f6" },
+                    font: { color: "#ffffff", size: 15 }
                 },
                 independent: {
-                    color: { background: '#95a5a6', border: '#7f8c8d' },
-                    font: { color: '#ffffff', size: 14 }
+                    color: { background: "#a8b1bd", border: "#8d959f" },
+                    font: { color: "#ffffff", size: 14 }
                 },
                 normal: {
-                    color: { background: '#f39c12', border: '#d68910' },
-                    font: { color: '#ffffff', size: 14 }
+                    color: { background: "#fbbf24", border: "#d97706" },
+                    font: { color: "#ffffff", size: 15 }
                 }
+            },
+
+            nodes: {
+                shadow: {
+                    enabled: true,
+                    size: 12,
+                    x: 1,
+                    y: 2
+                }
+            },
+
+            edges: {
+                smooth: { enabled: true, type: "continuous" },
+                color: { color: "#6ea8fe" },
+                width: 2,
+                shadow: true
             }
         };
+
 
         this.network = new vis.Network(container, data, options);
 
@@ -426,10 +486,14 @@ class TaskManager {
     }
 
     fitGraph() {
-        if (this.network) {
+    if (this.network && this.network.fit) {
+        try {
             this.network.fit({ animation: true });
+        } catch (e) {
+            console.warn("Graph fit skipped:", e);
         }
     }
+}
 
     exportGraph() {
         if (this.network) {
